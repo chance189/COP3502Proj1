@@ -41,6 +41,10 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="reversi_functions.h" />
+		<Unit filename="team09.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="team09.h" />
 		<Unit filename="team20.c">
 			<Option compilerVar="CC" />
 		</Unit>
