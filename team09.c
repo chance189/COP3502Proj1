@@ -34,7 +34,8 @@ position* team09_Best_Move(enum piece board[][SIZE], enum piece mine,  int depth
             test_pos = team09_initPos(i, j);
             if(isValidMove(board, test_pos, mine))
             {
-
+                //Evaluate the move if it is valid and if it is check if it is the move with the greatest score
+                //Our opponents score will be a negative score so the largest value of that will minimize what they do
             }
             else
             {
