@@ -19,6 +19,11 @@ extern int team09_Min_Max_Depth;
 extern int weight_forfeit, weight_frontier, weight_mobility, weight_stability;
 
 
+//Define a node for Min_Max_Tree
+typedef struct team09_Sim_Move{
+    position* sim_move; //postion that is tested
+    int quality_move; //maintains the attractiveness of move
+} team09_Sim_Move;
 
 position* team09Move(const enum piece board[][SIZE], enum piece mine, int secondsleft); //Required function
 
@@ -28,5 +33,8 @@ position* team09Move(const enum piece board[][SIZE], enum piece mine, int second
 
 //Returns the best possible move by using a min_max
 position* team09_Best_Move(enum piece board[][SIZE], enum piece mine, int depth, int alpha, int beta);
-position* team09_init_start_move(void);
+team09_Sim_Move* team09_init_start_move(void);
+void team09_free_Sim_Move(team09_Sim_Move* move);
+position* team09_initPos(int x, int y);
+
 #endif // TEAM09_H_INCLUDED
