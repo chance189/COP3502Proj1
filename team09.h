@@ -15,11 +15,11 @@
 * opponent has no valid moves
 * Use alpha beta pruning and min_max
 */
-extern int team09_Min_Max_Depth;
-extern int weight_forfeit, weight_frontier, weight_mobility, weight_stability;
 
 
 //Define a node for Min_Max_Tree
+//More negative the quality, better for black
+//more positive the quality, better for white
 typedef struct team09_Sim_Move{
     position* sim_move; //postion that is tested
     int quality_move; //maintains the attractiveness of move
@@ -32,9 +32,10 @@ position* team09Move(const enum piece board[][SIZE], enum piece mine, int second
 //position* team09Gen_Min_Max(const enum piece board[][SIZE], enum piece mine, int secondsLeft);
 
 //Returns the best possible move by using a min_max
-position* team09_Best_Move(enum piece board[][SIZE], enum piece mine, int depth, int alpha, int beta);
+team09_Sim_Move* team09_Best_Move(const enum piece board[][SIZE], enum piece mine, int depth, int alpha, int beta, int max_depth);
 team09_Sim_Move* team09_init_start_move(void);
 void team09_free_Sim_Move(team09_Sim_Move* move);
 position* team09_initPos(int x, int y);
+team09_Sim_Move* team09_init_empty_move(void);
 
 #endif // TEAM09_H_INCLUDED
