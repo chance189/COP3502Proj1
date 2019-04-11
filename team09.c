@@ -9,8 +9,9 @@
 #include "reversi_functions.h"
 
 const int team_09DX_SIZE = 8;
-const int team_09DX[] = {-1,-1,-1,0,0,1,1,1};
-const int team_09DY[] = {-1,0,1,-1,1,-1,0,1};
+//
+const int team_09DX[] = {-1,-1,-1, 0, 1, 1, 1,  0};
+const int team_09DY[] = {-1, 0, 1, 1, 1, 0,-1, -1};
 
 //Should return a valid position to play next on the board
 position* team09Move(const enum piece board[][SIZE], enum piece mine, int secondsleft)
@@ -26,10 +27,10 @@ position* team09Move(const enum piece board[][SIZE], enum piece mine, int second
     position* best_move_position;
 
     //If our min_max is approaching the end don't go too far
-    if((count_Me+count_opp) >= 59)
-        max_depth = (SIZE*SIZE) - (count_Me+count_opp);
-    else
-        max_depth = 5;
+    //if((count_Me+count_opp) >= 59)
+        //max_depth = (SIZE*SIZE) - (count_Me+count_opp);
+    //else
+    max_depth = 5;
 
     //printf("MAX DEPTH FOUND: %d", max_depth);
     best_move = team09_Best_Move(board, mine, 0, INT_MAX, -INT_MAX, max_depth);
@@ -48,7 +49,7 @@ team09_Sim_Move* team09_Best_Move(const enum piece board[][SIZE], enum piece min
     int no_Moves_Weight = 35;  //If we can choose a situation where the opponent can't move, that's good
     int legal_Moves_Weight = 5; //We want to have more moves than the opponent
     int emptySpace = 10; //If the spot contains an empty space, then it is not good
-    int no_eat = 55;  //most important to ensure that we make moves that don't allow opponent to eat our pieces
+    int no_eat = 50;  //most important to ensure that we make moves that don't allow opponent to eat our pieces
 
     enum piece tempBoard[SIZE][SIZE]; //Lets initialize a board, it is a local variable thus no need to free
     copy(tempBoard, board); //Copy the board into it
@@ -61,11 +62,14 @@ team09_Sim_Move* team09_Best_Move(const enum piece board[][SIZE], enum piece min
 
     int num_Valid_Moves, opp_Valid_Moves, i, game_Eval, no_moves = 0;
     //Evaluate the pieces that are next to spaces
-    int black_Next_Space, white_Next_Space;
+    int black_Next_Space, white_Next_Space, black_no_eat, white_no_eat;
 
     //Initialize positions
     position* opponent_valid;
     position* valid_positions = getPossibleMoves(board, mine, &num_Valid_Moves); //Grab all available moves
+
+    //int maxMove = count(board, mine);
+    //int newC;
     for(i = 0; i < num_Valid_Moves; i++)
     {
         //Since we know that the valid moves are in valid_positions we iterate over them
@@ -76,7 +80,6 @@ team09_Sim_Move* team09_Best_Move(const enum piece board[][SIZE], enum piece min
         //printf("\nTRYING CONFIGURATION: \n");
         //printBoard(tempBoard);
         //printf("\nEND-----\n");
-
         //After executing the move, get the total score value, which is more, white or black?
         game_Eval = count(tempBoard, WHITE) - count(tempBoard, BLACK);
 
@@ -109,7 +112,10 @@ team09_Sim_Move* team09_Best_Move(const enum piece board[][SIZE], enum piece min
             else //We reached max depth, rate this move
             {
                 team09_next_to_space(tempBoard, &black_Next_Space, &white_Next_Space);
-                sim_Move->quality_move = (emptySpace*(black_Next_Space-white_Next_Space)) //This is bad, since we want no spaces
+                team09_count_safe(tempBoard, &black_no_eat, &white_no_eat);
+                //printf("Black Safe: %d White Safe: %d\n Black next to space: %d, White next to space %d\n", black_no_eat, white_no_eat, black_Next_Space, white_Next_Space);
+                sim_Move->quality_move = no_eat*(white_no_eat-black_no_eat)+ //The value given if the move cannot be attacked
+                            (emptySpace*(black_Next_Space-white_Next_Space)) //This is bad, since we want no spaces
                             +(no_Moves_Weight*no_moves) //Want to try to force a forfeit
                             +(legal_Moves_Weight*(value*(num_Valid_Moves-opp_Valid_Moves)))+game_Eval;
             }
@@ -153,10 +159,12 @@ team09_Sim_Move* team09_Best_Move(const enum piece board[][SIZE], enum piece min
         if(sim_Move->quality_move > alpha && mine == WHITE)
         {
             team09_free_Sim_Move(bestMove); //Release our best move
+            sim_Move->quality_move = alpha;
             return sim_Move;
         }
         else if(sim_Move->quality_move < beta && mine == BLACK)
         {
+            sim_Move->quality_move = beta;
             team09_free_Sim_Move(bestMove);
             //printf("BROKE OUT DUE TO BLACK\n");
             return sim_Move;
@@ -173,14 +181,88 @@ void team09_count_safe(enum piece board[][SIZE], int*black_immune, int*white_imm
     int i, j;
     *black_immune = 0;
     *white_immune = 0;
+
     for(i = 0; i < SIZE; i++)
     {
         for(j = 0; j < SIZE; j++)
         {
-
+            //Know that we can take a piece if we have at least one space
+            //on a side of our piece
+            if(board[i][j] != EMPTY) //So if we get to a piece, check if it can be taken
+            {
+                if(team09_is_safe(board, i, j))
+                {
+                    //get type
+                    if(board[i][j] == BLACK)
+                        (*black_immune)++;
+                    else
+                        (*white_immune)++; //Only other case is white
+                }
+            }
         }
     }
 
+}
+
+int team09_is_safe(enum piece board[][SIZE], int x, int y)
+{
+    enum piece type = board[x][y];
+    int i;
+    position* spot = malloc(sizeof(position));
+    spot->x = x;
+    spot->y = y;
+
+    free(spot);
+    //go to next pos
+    for(i = 0; i < 4; i++)
+    {
+        //next pos
+        spot->x += team_09DX[i];
+        spot->y += team_09DY[i];
+
+        if(!inbounds(spot))  //not in bounds so automatically apss
+            continue; //go to next test
+
+        while(board[spot->x][spot->y] == type)
+        {
+            spot->x += team_09DX[i];
+            spot->y += team_09DY[i];
+            if(!inbounds(spot))
+                break;
+        }
+        //check if we are not in inbounds
+        if(!inbounds(spot)) //check if this is why we broke
+            continue; //if yes we are all good
+        else
+        {
+            //test opposite side since we must have reached wrong character
+            spot->x = x;
+            spot->y = y;
+            spot->x += team_09DX[(i+4)%team_09DX_SIZE]; //Move to next available on opposite side
+            spot->y += team_09DY[(i+4)%team_09DX_SIZE];
+            if(!inbounds(spot))
+                continue;
+
+            while(board[spot->x][spot->y] == type)
+            {
+                spot->x += team_09DX[(i+4)%team_09DX_SIZE];
+                spot->y += team_09DY[(i+4)%team_09DX_SIZE];
+                if(!inbounds(spot))
+                    break;
+            }
+            //check if we are not in inbounds
+            if(!inbounds(spot)) //check if this is why we broke
+                continue; //if yes we are all good
+            else
+            {
+                free(spot);
+                return 0;
+            }
+        }
+    }
+    //We get through all 4 cases! we are good!
+    free(spot);
+    return 1;
 }
 
 void team09_next_to_space(enum piece board[][SIZE], int*black_next_space, int*white_next_space)
@@ -204,10 +286,10 @@ void team09_next_to_space(enum piece board[][SIZE], int*black_next_space, int*wh
                     }
                     else if(newI >= 0 && newI < SIZE && newJ >=0 && newJ < SIZE)
                     {
-                        if(board[i][j] == EMPTY && board[i][j] == BLACK)
-                           black_next_space++;
-                        else if(board[i][j] == EMPTY && board[i][j] == WHITE)
-                            white_next_space++;
+                        if(board[newI][newJ] == EMPTY && board[i][j] == BLACK)
+                           (*black_next_space)+=1;
+                        else if(board[newI][newJ] == EMPTY && board[i][j] == WHITE)
+                            (*white_next_space)+=1;
                     }
                 }
             }

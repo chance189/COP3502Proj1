@@ -39,5 +39,6 @@ position* team09_initPos(int x, int y);
 team09_Sim_Move* team09_init_empty_move(void);
 void team09_next_to_space(enum piece board[][SIZE], int*black_next_space, int*white_next_space);
 void team09_count_safe(enum piece board[][SIZE], int*black_immune, int*white_immune);
+int team09_is_safe(enum piece board[][SIZE], int x, int y);
 
 #endif // TEAM09_H_INCLUDED
