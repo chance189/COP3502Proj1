@@ -8,6 +8,7 @@
 
 int main(void) {
     computerVComputer();
+    //humanVComputer();
     return 0;
 }
 
@@ -80,7 +81,7 @@ void computerVComputer() {
 
             // Do the move and time it.
             int startT = time(0);
-            mymove = team09Move(board, player, blackTime);
+            mymove = team21Move(board, player, blackTime);
             int endT = time(0);
 
             // Update time.
@@ -93,7 +94,7 @@ void computerVComputer() {
 
             // Do the move and time it.
             int startT = time(0);
-            mymove = team21Move(board, player, whiteTime);
+            mymove = team09Move(board, player, whiteTime);
             int endT = time(0);
 
             // Update time.
@@ -182,7 +183,7 @@ void humanVComputer() {
 
             // Do the move and time it.
             int startT = time(0);
-            mymove = team20Move(board, player, compTime);
+            mymove = team09Move(board, player, compTime);
             int endT = time(0);
 
             // Update time.
