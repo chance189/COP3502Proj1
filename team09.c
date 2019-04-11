@@ -27,8 +27,8 @@ position* team09Move(const enum piece board[][SIZE], enum piece mine, int second
     position* best_move_position;
 
     //If our min_max is approaching the end don't go too far
-    //if((count_Me+count_opp) >= 59)
-        //max_depth = (SIZE*SIZE) - (count_Me+count_opp);
+    if((count_Me+count_opp) >= 57)
+        max_depth = (SIZE*SIZE) - (count_Me+count_opp);
     //else
     max_depth = 5;
 
@@ -46,15 +46,15 @@ position* team09Move(const enum piece board[][SIZE], enum piece mine, int second
 */
 team09_Sim_Move* team09_Best_Move(const enum piece board[][SIZE], enum piece mine,  int depth, int alpha, int beta, int max_depth)
 {
-    int no_Moves_Weight = 35;  //If we can choose a situation where the opponent can't move, that's good
+    int no_Moves_Weight = 20;  //If we can choose a situation where the opponent can't move, that's good
     int legal_Moves_Weight = 5; //We want to have more moves than the opponent
     int emptySpace = 10; //If the spot contains an empty space, then it is not good
-    int no_eat = 50;  //most important to ensure that we make moves that don't allow opponent to eat our pieces
+    int no_eat = 40;  //most important to ensure that we make moves that don't allow opponent to eat our pieces
 
     enum piece tempBoard[SIZE][SIZE]; //Lets initialize a board, it is a local variable thus no need to free
     copy(tempBoard, board); //Copy the board into it
 
-    int value = (mine == BLACK) ? -1 : 1;
+    int value = (mine != BLACK) ? -1 : 1;
 
     team09_Sim_Move* sim_Move;
     team09_Sim_Move* bestMove = team09_init_start_move();
