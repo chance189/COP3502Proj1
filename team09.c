@@ -45,9 +45,10 @@ position* team09Move(const enum piece board[][SIZE], enum piece mine, int second
 */
 team09_Sim_Move* team09_Best_Move(const enum piece board[][SIZE], enum piece mine,  int depth, int alpha, int beta, int max_depth)
 {
-    int no_Moves_Weight = 30;
+    int no_Moves_Weight = 35;
     int legal_Moves_Weight = 5;
     int emptySpace_Weight = 10;
+    int moves_no_takeover = 55;
 
     enum piece tempBoard[SIZE][SIZE]; //Lets initialize a board, it is a local variable thus no need to free
     copy(tempBoard, board); //Copy the board into it
@@ -107,7 +108,9 @@ team09_Sim_Move* team09_Best_Move(const enum piece board[][SIZE], enum piece min
             else //We reached max depth, rate this move
             {
                 team09_next_to_space(tempBoard, &black_Next_Space, &white_Next_Space);
-                sim_Move->quality_move = (emptySpace_Weight*(black_Next_Space-white_Next_Space))+(no_Moves_Weight*no_moves)+(legal_Moves_Weight*(value*(num_Valid_Moves-opp_Valid_Moves)))+game_Eval;
+                sim_Move->quality_move = (emptySpace_Weight*(black_Next_Space-white_Next_Space)) //This is bad, since we want no spaces
+                            +(no_Moves_Weight*no_moves) //Want to try to force a forfeit
+                            +(legal_Moves_Weight*(value*(num_Valid_Moves-opp_Valid_Moves)))+game_Eval;
             }
         }
         else //Recurse
