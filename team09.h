@@ -37,5 +37,6 @@ team09_Sim_Move* team09_init_start_move(void);
 void team09_free_Sim_Move(team09_Sim_Move* move);
 position* team09_initPos(int x, int y);
 team09_Sim_Move* team09_init_empty_move(void);
+void team09_next_to_space(enum piece board[][SIZE], int*black_next_space, int*white_next_space);
 
 #endif // TEAM09_H_INCLUDED
