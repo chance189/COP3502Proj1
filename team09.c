@@ -23,7 +23,7 @@ position* team09Move(const enum piece board[][SIZE], enum piece mine, int second
     team09_Sim_Move* best_move;  //pointer to grab our result and free its memory
     position* best_move_position; //Ditto
 
-    best_move = team09_Best_Move(board, mine, 0, INT_MAX, INT_MIN, max_depth); //Grab our best Move
+    best_move = team09_Best_Move(board, mine, 0, INT_MIN, INT_MAX, max_depth); //Grab our best Move
     best_move_position = best_move->sim_move;  //Grab the position pointer needed to be returned
     //printf("\n THE VALUE OF THE BEST SCORE WAS: %d\n", best_move->quality_move); Debugging
     free(best_move); //Frees the memory allocated, but does not free position
@@ -52,19 +52,24 @@ team09_Sim_Move* team09_Best_Move(const enum piece board[][SIZE], enum piece min
     team09_Sim_Move* bestMove = team09_init_start_move();  //Create
     //team09_free_Sim_Move(bestMove); //deallocate meme used
 
-    int num_Valid_Moves, opp_Valid_Moves, i, game_Eval, no_moves = 0;
+    //initialize counter,
+    int i, game_Eval, no_moves = 0;
     //Evaluate the pieces that are next to spaces
     int black_Next_Space, white_Next_Space, black_no_eat, white_no_eat;
 
-    //Initialize positions
+    //For Opponent Positions
+    int opp_Valid_Moves;
     position* opponent_valid;
+
+    //For My Positions
+    int num_Valid_Moves;
     position* valid_positions = getPossibleMoves(board, mine, &num_Valid_Moves); //Grab all available moves
 
     //Since we know that the valid moves are in valid_positions we iterate over them
     for(i = 0; i < num_Valid_Moves; i++)
     {
-        no_moves = 0;
-        copy(tempBoard, board); //New copy every time for resetting
+        no_moves = 0;    //reset this variable to detect interrupts for opponent
+        copy(tempBoard, board); //New copy every time for resetting board to original state
 
         //For each available ones, we should make the move
         sim_Move = team09_init_empty_move();
@@ -108,8 +113,8 @@ team09_Sim_Move* team09_Best_Move(const enum piece board[][SIZE], enum piece min
             }
             else //We reached max depth, rate this move
             {
-                team09_next_to_space(tempBoard, &black_Next_Space, &white_Next_Space);
-                team09_count_safe(tempBoard, &black_no_eat, &white_no_eat);
+                team09_next_to_space(tempBoard, &black_Next_Space, &white_Next_Space); //populate all pieces touching spaces
+                team09_count_safe(tempBoard, &black_no_eat, &white_no_eat);            //populate all pieces that cannot be taken by opponent
 
                 sim_Move->quality_move = no_eat*(white_no_eat-black_no_eat)+ //The value given if the move cannot be attacked
                             (emptySpace*(black_Next_Space-white_Next_Space)) //This is bad, since we want no spaces
@@ -130,10 +135,10 @@ team09_Sim_Move* team09_Best_Move(const enum piece board[][SIZE], enum piece min
             }
 
             //Alpha beta pruning concept here
-            if(sim_Move->quality_move > beta && mine == WHITE) //Since White is positive (Max) it associates with alpha
-                beta = sim_Move->quality_move;
-            else if(sim_Move->quality_move < alpha && mine == BLACK) //Since black is min, associates with beta
+            if(sim_Move->quality_move > alpha && mine == WHITE) //Since White is positive (Max) it associates with alpha
                 alpha = sim_Move->quality_move;
+            else if(sim_Move->quality_move < beta && mine == BLACK) //Since black is min, associates with beta
+                beta = sim_Move->quality_move;
         }
 
         if(bestMove->sim_move->x == -1) //test if this is our first
@@ -150,20 +155,20 @@ team09_Sim_Move* team09_Best_Move(const enum piece board[][SIZE], enum piece min
         }
 
         //check if we go outside our ranges
-        if(sim_Move->quality_move > alpha && mine == WHITE)
-        {
-            bestMove->sim_move->x = sim_Move->sim_move->x;
-            bestMove->sim_move->y = sim_Move->sim_move->y;
-            bestMove->quality_move = alpha;
-            free(sim_Move); //Release our best move
-            free(valid_positions);
-            return bestMove;
-        }
-        else if(sim_Move->quality_move < beta && mine == BLACK)
+        if(sim_Move->quality_move > beta && mine == WHITE)
         {
             bestMove->sim_move->x = sim_Move->sim_move->x;
             bestMove->sim_move->y = sim_Move->sim_move->y;
             bestMove->quality_move = beta;
+            free(sim_Move); //Release our best move
+            free(valid_positions);
+            return bestMove;
+        }
+        else if(sim_Move->quality_move < alpha && mine == BLACK)
+        {
+            bestMove->sim_move->x = sim_Move->sim_move->x;
+            bestMove->sim_move->y = sim_Move->sim_move->y;
+            bestMove->quality_move = alpha;
             free(sim_Move); //Release our best move
             free(valid_positions);
             return bestMove;
