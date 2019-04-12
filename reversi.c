@@ -82,7 +82,7 @@ void computerVComputer() {
 
             // Do the move and time it.
             int startT = time(0);
-            mymove = team20Move(board, player, blackTime);
+            mymove = team09Move(board, player, blackTime);
             int endT = time(0);
 
             // Update time.
@@ -95,7 +95,7 @@ void computerVComputer() {
 
             // Do the move and time it.
             int startT = time(0);
-            mymove = team09Move(board, player, whiteTime);
+            mymove = team20Move(board, player, whiteTime);
             int endT = time(0);
 
             // Update time.
