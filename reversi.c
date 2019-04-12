@@ -5,6 +5,8 @@
 #include "team20.h"
 #include "team21.h"
 #include "reversi.h"
+#include "team09.h"
+#include "team09_2.h"
 
 int main(void) {
     computerVComputer();
