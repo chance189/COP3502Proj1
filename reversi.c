@@ -6,7 +6,6 @@
 #include "team21.h"
 #include "reversi.h"
 #include "team09.h"
-#include "team09_2.h"
 
 int main(void) {
     computerVComputer();
@@ -83,7 +82,7 @@ void computerVComputer() {
 
             // Do the move and time it.
             int startT = time(0);
-            mymove = team21Move(board, player, blackTime);
+            mymove = team20Move(board, player, blackTime);
             int endT = time(0);
 
             // Update time.

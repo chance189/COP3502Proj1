@@ -35,7 +35,7 @@ position* team09Move(const enum piece board[][SIZE], enum piece mine, int second
     //if(mine == BLACK)
         //max_depth = 5;
     //else
-    max_depth = 5;
+    max_depth = 4;
 
     //printf("MAX DEPTH FOUND: %d", max_depth);
     best_move = team09_Best_Move(board, mine, 0, INT_MAX, INT_MIN, max_depth);
