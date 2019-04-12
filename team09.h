@@ -3,6 +3,8 @@
 
 #include "reversi_functions.h"
 
+//Author: Chance Reimer & Reia Drucker
+//Date: 4/11/2019
 /*All prototypes here
 * Alpha Beta pruning algorithm, uses Weight for the amount of available moves, the ability to take moves away from the other plater,
 * And by choosing the move that will win!
@@ -36,9 +38,6 @@ int team09_is_safe(enum piece board[][SIZE], int x, int y);
 //Inits the struct we created for our tree
 team09_Sim_Move* team09_init_start_move(void);
 void team09_free_Sim_Move(team09_Sim_Move* move);
-
-//Did I use this?
-position* team09_initPos(int x, int y);
 team09_Sim_Move* team09_init_empty_move(void);
 
 #endif // TEAM09_H_INCLUDED

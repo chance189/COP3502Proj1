@@ -19,13 +19,14 @@ position* team09Move(const enum piece board[][SIZE], enum piece mine, int second
 {
     //Max depth
     int max_depth = 4;
+
     //Initialize our MinMax end result
     team09_Sim_Move* best_move;  //pointer to grab our result and free its memory
     position* best_move_position; //Ditto
 
     best_move = team09_Best_Move(board, mine, 0, INT_MIN, INT_MAX, max_depth); //Grab our best Move
     best_move_position = best_move->sim_move;  //Grab the position pointer needed to be returned
-    //printf("\n THE VALUE OF THE BEST SCORE WAS: %d\n", best_move->quality_move); Debugging
+
     free(best_move); //Frees the memory allocated, but does not free position
     return best_move_position;  //return
 }
@@ -50,7 +51,6 @@ team09_Sim_Move* team09_Best_Move(const enum piece board[][SIZE], enum piece min
 
     team09_Sim_Move* sim_Move;  //Simulate the next move
     team09_Sim_Move* bestMove = team09_init_start_move();  //Create
-    //team09_free_Sim_Move(bestMove); //deallocate meme used
 
     //initialize counter,
     int i, game_Eval, no_moves = 0;
@@ -93,7 +93,6 @@ team09_Sim_Move* team09_Best_Move(const enum piece board[][SIZE], enum piece min
         {
             //There are no valid moves, so we increment our counter
             no_moves = Min_Or_Max;
-            //gameOver_local = gameOver(tempBoard);
 
             //If opponent has no moves, it's my turn again!
             Opponent = mine;
@@ -109,7 +108,7 @@ team09_Sim_Move* team09_Best_Move(const enum piece board[][SIZE], enum piece min
                 else if(game_Eval < 0) // black wins, make this maximum negative
                     sim_Move->quality_move = INT_MIN;
                 else
-                    sim_Move->quality_move = 0;
+                    sim_Move->quality_move = 0; //ties
             }
             else //We reached max depth, rate this move
             {
@@ -129,7 +128,7 @@ team09_Sim_Move* team09_Best_Move(const enum piece board[][SIZE], enum piece min
             team09_free_Sim_Move(move_forward); //We only really care about how good this move is
 
             //Keep track of if our opponent has no moves
-            if(no_moves != 0) //(abs(sim_Move->quality_move+(no_Moves_Weight*no_moves))< INT_MAX) &&
+            if(no_moves != 0 && sim_Move->quality_move != INT_MAX && sim_Move->quality_move != INT_MIN)
             {
                 sim_Move->quality_move += no_Moves_Weight*no_moves;
             }
@@ -155,7 +154,7 @@ team09_Sim_Move* team09_Best_Move(const enum piece board[][SIZE], enum piece min
         }
 
         //check if we go outside our ranges
-        if(sim_Move->quality_move > beta && mine == WHITE)
+        if(sim_Move->quality_move > beta && mine == WHITE)  //test case beta < alpha, we return on this condition
         {
             bestMove->sim_move->x = sim_Move->sim_move->x;
             bestMove->sim_move->y = sim_Move->sim_move->y;
@@ -164,7 +163,7 @@ team09_Sim_Move* team09_Best_Move(const enum piece board[][SIZE], enum piece min
             free(valid_positions);
             return bestMove;
         }
-        else if(sim_Move->quality_move < alpha && mine == BLACK)
+        else if(sim_Move->quality_move < alpha && mine == BLACK) //test case beta < alpha, we return on this condition
         {
             bestMove->sim_move->x = sim_Move->sim_move->x;
             bestMove->sim_move->y = sim_Move->sim_move->y;
